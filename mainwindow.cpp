@@ -4,6 +4,11 @@
 #include "qmessagebox.h"
 #include <iostream>
 #include <string.h>
+#include <QtSerialPort/QSerialPort>
+#include <QtSerialPort/QSerialPortInfo>
+#include "addbauddialog.h"
+#include <QDesktopServices>
+#include <QUrl>
 
 QSerialPort *g_mySerialPort;
 QByteArray g_arry;
@@ -16,7 +21,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->centralWidget->setLayout(ui->verticalLayout_2);
     init();
     connect(g_mySerialPort, SIGNAL(readyRead()), this, SLOT(recv_data()));
-    ui->statusBar->showMessage("1710252441-郑世豪");
+    connect(ui->action_addbaud, SIGNAL(triggered()), this, SLOT(add_baud()));
+    connect(ui->actiongithub, SIGNAL(triggered(bool)), this, SLOT(github()));
+    connect(ui->actionhelp, SIGNAL(triggered(bool)), this, SLOT(help()));
+    ui->statusBar->showMessage("Author:  zsh   github.com/zshorz/AccessPort");
 }
 
 MainWindow::~MainWindow()
@@ -26,11 +34,32 @@ MainWindow::~MainWindow()
 
 void MainWindow::setPort()
 {
+    // 设置串口名
     g_mySerialPort->setPortName(ui->comboBox_COMx->currentText());
+    // 设置波特率
     g_mySerialPort->setBaudRate(ui->comboBox_Baud->currentText().toInt());
-    g_mySerialPort->setDataBits(QSerialPort::Data8);
-    g_mySerialPort->setStopBits(QSerialPort::OneStop);
-    g_mySerialPort->setParity(QSerialPort::NoParity);
+    // 设置数据位
+    g_mySerialPort->setDataBits(QSerialPort::DataBits(ui->comboBox_DataBits->currentText().toInt()));
+    // 设置停止位
+    double d = ui->comboBox_StopBits->currentText().toDouble();
+    if (d > 1.0 && d < 2.0) {
+        g_mySerialPort->setStopBits(QSerialPort::OneAndHalfStop);
+    } else {
+       g_mySerialPort->setStopBits(QSerialPort::StopBits(ui->comboBox_StopBits->currentText().toInt()));
+    }
+    // 设置校验方式
+    QString str = ui->comboBox_Parity->currentText();
+    if (str == tr("no")) {
+        g_mySerialPort->setParity(QSerialPort::NoParity);
+    } else if (str == tr("偶校验")) {
+         g_mySerialPort->setParity(QSerialPort::EvenParity);
+    } else if (str == tr("奇校验")) {
+        g_mySerialPort->setParity(QSerialPort::OddParity);
+   } else if (str == tr("space parity")) {
+        g_mySerialPort->setParity(QSerialPort::SpaceParity);
+   } else if (str == tr("mark parity")) {
+        g_mySerialPort->setParity(QSerialPort::MarkParity);
+   }
 }
 
 void MainWindow::init()
@@ -49,10 +78,21 @@ void MainWindow::init()
     }
     // 添加停止位
     ui->comboBox_StopBits->addItem(QString::number(1));
+    ui->comboBox_StopBits->addItem(QString::number(1.5));
+    ui->comboBox_StopBits->addItem(QString::number(2));
+    ui->comboBox_StopBits->setCurrentText(QString::number(1));
     // 添加数据位
+    ui->comboBox_DataBits->addItem(QString::number(5));
+    ui->comboBox_DataBits->addItem(QString::number(6));
+    ui->comboBox_DataBits->addItem(QString::number(7));
     ui->comboBox_DataBits->addItem(QString::number(8));
-    // 添加奇偶校验
+    ui->comboBox_DataBits->setCurrentText(QString::number(8));
+    // 添加校验方式
     ui->comboBox_Parity->addItem(tr("no"));
+    ui->comboBox_Parity->addItem(tr("偶校验"));
+    ui->comboBox_Parity->addItem(tr("奇校验"));
+    ui->comboBox_Parity->addItem(tr("space parity"));
+    ui->comboBox_Parity->addItem(tr("mark parity"));
 
     g_mySerialPort = new QSerialPort(this);
 
@@ -90,6 +130,31 @@ void MainWindow::recv_data()
     }
 }
 
+void MainWindow::add_baud()
+{
+    qDebug() << "add_baud()";
+    AddBaudDialog *dialog = new AddBaudDialog(this);
+    connect(dialog, SIGNAL(addbaud(int)), this, SLOT(do_add_baud(int)));
+    dialog->exec();
+    disconnect(dialog, SIGNAL(addbaud(int)), this, SLOT(do_add_baud(int)));
+}
+
+void MainWindow::do_add_baud(int a)
+{
+    ui->comboBox_Baud->addItem(QString::number(a));
+    ui->comboBox_Baud->setCurrentText(QString::number(a));
+}
+
+void MainWindow::github()
+{
+    QDesktopServices::openUrl(QUrl("https://github.com/zshorz/AccessPort"));
+}
+
+void MainWindow::help()
+{
+    QDesktopServices::openUrl(QUrl("https://github.com/zshorz/AccessPort/blob/master/README.md"));
+}
+
 
 void MainWindow::on_pushButton_open_clicked()
 {
@@ -102,11 +167,11 @@ void MainWindow::on_pushButton_open_clicked()
             return;
         }
         ui->pushButton_open->setText(tr("关闭串口"));
-        ui->statusBar->showMessage("打开成功");
+        ui->statusBar->showMessage(tr("打开成功"));
     } else {
         g_mySerialPort->close();
         ui->pushButton_open->setText(tr("打开串口"));
-        ui->statusBar->showMessage("已关闭");
+        ui->statusBar->showMessage(tr("已关闭"));
     }
 
 }

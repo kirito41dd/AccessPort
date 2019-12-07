@@ -2,9 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QtSerialPort/QSerialPort>
-#include <QtSerialPort/QSerialPortInfo>
 
+class QSerialPort;
 extern QSerialPort *g_mySerialPort;
 
 namespace Ui {
@@ -32,6 +31,10 @@ private:
 
  private slots:
     void recv_data(void);
+    void add_baud(void);
+    void do_add_baud(int);
+    void github(void);
+    void help(void);
     void on_pushButton_send_clicked();
     void on_pushButton_send_16_clicked();
     void on_pushButton_mode_clicked();
