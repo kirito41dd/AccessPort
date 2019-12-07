@@ -38,3 +38,8 @@ FORMS += \
 
 RESOURCES += \
     qrc.qrc
+
+DISTFILES += \
+    SerialPort.rc
+
+RC_FILE = SerialPort.rc
