@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/">
+        <file>../img/conf.ico</file>
+        <file>../img/conf2.ico</file>
+        <file>../img/conf3.ico</file>
+        <file>../img/conf4.ico</file>
+        <file>../img/github.ico</file>
+        <file>../img/help.ico</file>
+        <file>../img/icon32.ico</file>
+        <file>../img/icon64.ico</file>
+    </qresource>
+</RCC>
