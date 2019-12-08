@@ -1,5 +1,6 @@
 #include "addbauddialog.h"
 #include "ui_addbauddialog.h"
+#include <QRegExpValidator>
 
 AddBaudDialog::AddBaudDialog(QWidget *parent) :
     QDialog(parent),
