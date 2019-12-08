@@ -15,7 +15,7 @@ public:
     explicit AddBaudDialog(QWidget *parent = 0);
     ~AddBaudDialog();
 signals:
-    addbaud(int);
+    void addbaud(int);
 
 private slots:
     void on_pushButton_ok_clicked();
