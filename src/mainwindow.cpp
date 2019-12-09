@@ -97,7 +97,7 @@ void MainWindow::init()
     g_mySerialPort = new QSerialPort(this);
 
     // 设置16进制输入
-    QRegExp regexp("[a-fA-f0-9 ]{100}");
+    QRegExp regexp("[a-fA-F0-9 ]{100}");
     ui->lineEdit_send_16->setValidator(new QRegExpValidator(regexp, this));
 }
 
